@@ -1,5 +1,3 @@
-import { getAuthHeaders } from '../stores';
-
 const getBaseUrl = (): string =>
   import.meta.env.VITE_API_BASE ?? 'http://localhost:3000';
 
@@ -21,7 +19,7 @@ export type RequestOptions = RequestInit & {
 
 /**
  * Wrapper para llamadas al API backend.
- * Añade base URL, cabecera Authorization con JWT y maneja 401 (cierra sesión).
+ * Añade base URL, envía cookies HTTPOnly (JWT) y maneja 401 (cierra sesión).
  */
 export async function apiRequest<T>(
   path: string,
@@ -29,19 +27,13 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const { defaultErrorMessage = 'Error en la petición', ...init } = options;
   const url = `${getBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`;
-  const headers: Record<string, string> = {
-    ...getAuthHeaders(),
-    ...(init.headers as Record<string, string>),
-  };
+  const headers: Record<string, string> = { ...(init.headers as Record<string, string>) };
   if (init.body != null && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
-  const res = await fetch(url, { ...init, headers });
+  const res = await fetch(url, { ...init, headers, credentials: init.credentials ?? 'include' });
   if (!res.ok) await handleErrorResponse(res, defaultErrorMessage);
   const text = await res.text();
   if (!text) return undefined as T;
   return JSON.parse(text) as T;
 }
-
-/** Cabeceras con JWT para peticiones que no pasan por apiRequest (re-export desde store). */
-export { getAuthHeaders };
