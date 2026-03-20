@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CourseService } from './application/course.service';
 import { COURSE_REPOSITORY } from './domain/course.repository';
-import { CourseTypeOrmEntity } from './infrastructure/course-typeorm.entity';
 import { CourseTypeOrmRepository } from './infrastructure/course-typeorm.repository';
+import { CourseEntity } from './infrastructure/persistence/course.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CourseTypeOrmEntity])],
+  imports: [TypeOrmModule.forFeature([CourseEntity])],
   providers: [
     CourseService,
     {
