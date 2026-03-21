@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { MainLayout } from "../../templates/MainLayout";
 import { Student } from "../../../entities/student"
-
+import {
+  getStudents,
+  getStudent,
+  updateStudentBirthDate,
+  updateStudentUserEmail,
+} from './../../../services/studentService';
 
 export function MiPerfilPage() {
   const [student, setStudent] = useState<Student | null>(null);
   const [birthDate, setBirthDate] = useState("");
   const [email, setEmail] = useState("");
-
-  const token = localStorage.getItem("academic_token") || "";
 
   useEffect(() => {
     loadStudent();
@@ -26,10 +29,7 @@ export function MiPerfilPage() {
 
     try {
       // Obtener todos los estudiantes
-      const respo = await fetch("http://localhost:3000/students", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const students: Student[] = await respo.json();
+      const students: Student[] = await getStudents();
 
       // Buscar el estudiante con userId
       const myStudent = students.find((s) => s.userId === userId);
@@ -38,14 +38,8 @@ export function MiPerfilPage() {
         return;
       }
 
-      // Obtener datos completos del estudiante
-      const response = await fetch(
-        `http://localhost:3000/students/${myStudent.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data: Student = await response.json();
+      // Obtener datos completos del estudiante      
+      const data: Student = await getStudent(myStudent.id);
 
       setStudent(data);
       setBirthDate(data.birthDate.split("T")[0]); // YYYY-MM-DD
@@ -55,36 +49,16 @@ export function MiPerfilPage() {
     }
   }
 
-  // Formatear la fecha antes de enviarla al backend
-  function formatBirthDateForBackend(dateString: string) {
-    return `${dateString}T00:00:00`;
-  }
 
   async function handleSave() {
     if (!student) return;
 
     try {
-      // PATCH birthDate
-      await fetch(`http://localhost:3000/students/${student.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          birthDate: formatBirthDateForBackend(birthDate),
-        }),
-      });
+      // PATCH birthDate      
+      await updateStudentBirthDate(student.id,birthDate);
 
       // PATCH email
-      await fetch(`http://localhost:3000/users/${student.userId}/email`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ email }),
-      });
+      await updateStudentUserEmail(student.userId,email);
 
       alert("Datos actualizados correctamente");
       loadStudent(); // recargar para reflejar cambios
