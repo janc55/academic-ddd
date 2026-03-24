@@ -10,7 +10,10 @@ import { HorariosPage } from './components/pages/HorariosPage';
 import { MiPerfilPage } from './components/pages/MiPerfilPage';
 import { MisClasesPage } from './components/pages/MisClasesPage';
 import { PlaceholderPage } from './components/pages/PlaceholderPage';
+<<<<<<< HEAD
 import { DepartamentosPage } from './components/pages/DepartamentosPage'
+=======
+>>>>>>> 00efccea6476f5df81d3370e2033824234b5dd82
 
 function App() {
   return (
@@ -38,7 +41,11 @@ function App() {
           <Route path="/profesores" element={<PlaceholderPage title="Profesores" />} />
           <Route path="/periodos-academicos" element={<PlaceholderPage title="Períodos académicos" />} />
           <Route path="/programas" element={<PlaceholderPage title="Programas" />} />
+<<<<<<< HEAD
           <Route path="/departamentos" element={<DepartamentosPage />} />
+=======
+          <Route path="/departamentos" element={<PlaceholderPage title="Departamentos" />} />
+>>>>>>> 00efccea6476f5df81d3370e2033824234b5dd82
           <Route path="/oferta-cursos" element={<PlaceholderPage title="Oferta de cursos" />} />
           <Route path="/calificaciones" element={<PlaceholderPage title="Calificaciones" />} />
           <Route path="/prerrequisitos" element={<PlaceholderPage title="Prerrequisitos" />} />

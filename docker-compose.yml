@@ -3,7 +3,11 @@
 
 services:
   postgres:
+<<<<<<< HEAD
     image: postgres:16
+=======
+    image: postgres:16-alpine
+>>>>>>> 00efccea6476f5df81d3370e2033824234b5dd82
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

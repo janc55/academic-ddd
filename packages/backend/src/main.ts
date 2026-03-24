@@ -22,9 +22,15 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
+<<<<<<< HEAD
   origin: 'http://localhost:5173', // ⚠️ EXACTO
   credentials: true,
 });
+=======
+    origin: process.env.CORS_ORIGIN?.split(',').map((o) => o.trim()) ?? true,
+    credentials: true,
+  });
+>>>>>>> 00efccea6476f5df81d3370e2033824234b5dd82
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
