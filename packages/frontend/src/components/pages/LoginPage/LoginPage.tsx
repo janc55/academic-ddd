@@ -5,7 +5,7 @@ import { Button } from '../../atoms/Button';
 import { Input } from '../../atoms/Input';
 import { login } from '../../../services/authService';
 import { useAuthStore } from '../../../stores';
-import { trackEvent, trackPageView } from '../../../lib/analytics';
+import { trackEvent } from '../../../lib/analytics';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -15,9 +15,6 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (typeof window !== 'undefined') {
-    trackPageView('/login', 'Login');
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +103,7 @@ export function LoginPage() {
           <div className="flex items-center justify-end">
             <Link
               to="/forgot-password"
+              onClick={() => trackEvent('enter_forgot_password')}
               className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
             >
               ¿Olvidaste tu contraseña?

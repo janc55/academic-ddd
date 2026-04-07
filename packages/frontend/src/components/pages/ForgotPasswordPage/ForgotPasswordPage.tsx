@@ -4,7 +4,7 @@ import { MainLayout } from '../../templates/MainLayout';
 import { Button } from '../../atoms/Button';
 import { Input } from '../../atoms/Input';
 import { forgotPassword, verifyCode, resetPassword } from '../../../services/authService';
-import { trackEvent, trackPageView } from '../../../lib/analytics';
+import { trackEvent } from '../../../lib/analytics';
 
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -17,9 +17,6 @@ export function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  if (typeof window !== 'undefined') {
-    trackPageView('/forgot-password', `Forgot Password - Step ${step}`);
-  }
 
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,9 +26,11 @@ export function ForgotPasswordPage() {
       await forgotPassword(email);
       setSuccess('Código enviado correctamente. Revisa la consola del servidor.');
       setStep(2);
-      trackEvent('forgot_password_request', { email });
+      trackEvent('forgot_password_request_sent', { email });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al enviar el código');
+      const errorMessage = err instanceof Error ? err.message : 'Error al enviar el código';
+      setError(errorMessage);
+      trackEvent('forgot_password_error', { step: 1, error: errorMessage, email });
     } finally {
       setLoading(false);
     }
@@ -46,11 +45,16 @@ export function ForgotPasswordPage() {
       if (result.valid) {
         setStep(3);
         setSuccess(null);
+        trackEvent('forgot_password_code_verified', { email });
       } else {
-        setError('Código inválido');
+        const errorMessage = 'Código inválido';
+        setError(errorMessage);
+        trackEvent('forgot_password_error', { step: 2, error: errorMessage, email });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al verificar el código');
+      const errorMessage = err instanceof Error ? err.message : 'Error al verificar el código';
+      setError(errorMessage);
+      trackEvent('forgot_password_error', { step: 2, error: errorMessage, email });
     } finally {
       setLoading(false);
     }
@@ -60,19 +64,23 @@ export function ForgotPasswordPage() {
     e.preventDefault();
     setError(null);
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      const errorMessage = 'Las contraseñas no coinciden';
+      setError(errorMessage);
+      trackEvent('forgot_password_error', { step: 3, error: errorMessage, email });
       return;
     }
     setLoading(true);
     try {
       await resetPassword(email, code, password);
       setSuccess('Contraseña actualizada correctamente. Redirigiendo al login...');
-      trackEvent('password_reset_success', { email });
+      trackEvent('forgot_password_success', { email });
       setTimeout(() => {
         navigate('/login');
       }, 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al actualizar la contraseña');
+      const errorMessage = err instanceof Error ? err.message : 'Error al actualizar la contraseña';
+      setError(errorMessage);
+      trackEvent('forgot_password_error', { step: 3, error: errorMessage, email });
     } finally {
       setLoading(false);
     }

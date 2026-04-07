@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
-import { ProtectedRoute } from './components/guards';
+import { ProtectedRoute, PageTracker } from './components/guards';
 import { HomePage } from './components/pages/HomePage';
 import { LoginPage } from './components/pages/LoginPage';
 import { ForgotPasswordPage } from './components/pages/ForgotPasswordPage';
@@ -21,6 +21,7 @@ import {
 function App() {
   return (
     <BrowserRouter>
+      <PageTracker />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
