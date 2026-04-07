@@ -17,7 +17,7 @@ export function initAnalytics() {
 
   if (GA_MEASUREMENT_ID && !window.gtag) {
     window.dataLayer = window.dataLayer || [];
-    function gtag() {
+    function gtag(..._args: any[]) {
       // eslint-disable-next-line prefer-rest-params
       window.dataLayer!.push(arguments);
     }
