@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { ProtectedRoute } from './components/guards';
 import { HomePage } from './components/pages/HomePage';
 import { LoginPage } from './components/pages/LoginPage';
+import { ForgotPasswordPage } from './components/pages/ForgotPasswordPage';
 import { EstudiantesPage, RegisterPage, EditPage } from './components/pages/EstudiantesPage';
 import { InscripcionCursosPage } from './components/pages/InscripcionCursosPage';
 import { UsuariosPage } from './components/pages/UsuariosPage';
@@ -22,6 +23,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route
           element={
             <ProtectedRoute>

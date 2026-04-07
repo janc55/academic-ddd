@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import type { CookieOptions, Request, Response } from 'express';
 import { AuthService } from '../../../contexts/identity-access/auth/application/auth.service';
 import { Public } from '../../../contexts/identity-access/auth/infrastructure/public.decorator';
@@ -51,5 +51,31 @@ export class AuthController {
     res.cookie(JWT_COOKIE_NAME, result.access_token, cookieOptions);
 
     return result;
+  }
+
+  @Public()
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: { email: string }) {
+    await this.authService.forgotPassword(body.email);
+    return { message: 'Código de recuperación enviado' };
+  }
+
+  @Public()
+  @Post('verify-code')
+  async verifyCode(@Body() body: { email: string; code: string }) {
+    const isValid = await this.authService.verifyCode(body.email, body.code);
+    if (!isValid) {
+      throw new UnauthorizedException('Código inválido o expirado');
+    }
+    return { message: 'Código verificado correctamente', valid: true };
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(
+    @Body() body: { email: string; code: string; password: string },
+  ) {
+    await this.authService.resetPassword(body.email, body.code, body.password);
+    return { message: 'Contraseña actualizada correctamente' };
   }
 }

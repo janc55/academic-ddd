@@ -48,6 +48,10 @@ export class UserService {
     return this.userRepository.findByUsername(username);
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findByEmail(email);
+  }
+
   async verifyPassword(plainPassword: string, hash: string): Promise<boolean> {
     return bcrypt.compare(plainPassword, hash);
   }
@@ -131,6 +135,23 @@ export class UserService {
 
   async delete(userId: string): Promise<void> {
     await this.userRepository.delete(userId);
+  }
+
+  async resetPassword(userId: string, newPassword: string): Promise<void> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const newPasswordHash = await this.createPasswordHash(newPassword);
+    const updated = new User(
+      user.id,
+      user.username,
+      user.email,
+      user.roleId,
+      newPasswordHash,
+    );
+    await this.userRepository.save(updated);
   }
 
   private async createPasswordHash(password: string): Promise<string> {

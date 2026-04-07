@@ -19,11 +19,55 @@ export type LoginResponse = {
 
 @Injectable()
 export class AuthService {
+  private resetCodes = new Map<string, { code: string; expires: number }>();
+
   constructor(
     private readonly userService: UserService,
     private readonly roleService: RoleService,
     private readonly jwtService: JwtService,
   ) {}
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      // Don't leak user existence? Or fine for this school project.
+      // We'll just return as if it was sent if we want to be secure,
+      // but usually for internal tools/school projects we can throw.
+      throw new UnauthorizedException('Email no encontrado');
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    this.resetCodes.set(email.toLowerCase(), { code, expires });
+
+    console.log(`[SIMULATED EMAIL] Para: ${email} - Código: ${code}`);
+  }
+
+  async verifyCode(email: string, code: string): Promise<boolean> {
+    const data = this.resetCodes.get(email.toLowerCase());
+    if (!data) return false;
+    if (data.expires < Date.now()) {
+      this.resetCodes.delete(email.toLowerCase());
+      return false;
+    }
+    return data.code === code;
+  }
+
+  async resetPassword(email: string, code: string, newPassword: string): Promise<void> {
+    const isValid = await this.verifyCode(email, code);
+    if (!isValid) {
+      throw new UnauthorizedException('Código inválido o expirado');
+    }
+
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
+
+    await this.userService.resetPassword(user.id, newPassword);
+    this.resetCodes.delete(email.toLowerCase());
+  }
 
   async login(username: string, password: string): Promise<LoginResponse> {
     const user = await this.userService.findByUsername(username);

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { MainLayout } from '../../templates/MainLayout';
 import { Button } from '../../atoms/Button';
 import { Input } from '../../atoms/Input';
@@ -102,6 +102,16 @@ export function LoginPage() {
               {error}
             </p>
           )}
+
+          <div className="flex items-center justify-end">
+            <Link
+              to="/forgot-password"
+              className="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+
           <div className="flex gap-3 pt-1">
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? 'Ingresando…' : 'Ingresar'}

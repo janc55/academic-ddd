@@ -29,6 +29,13 @@ export class UserTypeOrmRepository implements IUserRepository {
     return row ? this.toDomain(row) : null;
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    const row = await this.repo.findOne({
+      where: { email: email.toLowerCase() },
+    });
+    return row ? this.toDomain(row) : null;
+  }
+
   async save(user: User): Promise<User> {
     const row = this.repo.create({
       id: user.id,
